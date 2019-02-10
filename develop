@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+cd "$(dirname "$0")"
+
+if [[ $# -gt 0 ]]; then
+
+    if [[ "$1" == "start" ]]; then
+        docker-compose up -d
+
+    elif [[ "$1" == "stop" ]]; then
+        docker-compose stop
+
+    elif [[ "$1" == "chown" ]]; then
+        sudo chown -R $(whoami):$(whoami) ./
+
+    elif [[ "$1" == "chmod" ]]; then
+        shift 1
+        sudo chmod -R 0777 "$@"
+
+    else
+        docker-compose "$@"
+    fi
+
+else
+    docker-compose ps
+fi

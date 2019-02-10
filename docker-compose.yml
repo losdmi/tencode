@@ -1,0 +1,11 @@
+version: '3'
+services:
+  bot:
+    image: ${DOCKER_IMAGES_PREFIX}_bot:latest
+    env_file: .env
+    build:
+      context: ./
+      dockerfile: ./docker/bot/Dockerfile
+      args:
+        app_root: ${APP_ROOT:-/bot}
+        src: ${SRC:-./src}
