@@ -44,7 +44,7 @@ def replace_tencode_in_message(message: str) -> str:
 
 def _get_tencode_meaning(word: str) -> str:
     meaning = _tencodes_dictionary.get(word)
-    return '[' + meaning + ']' if meaning else word
+    return '<' + meaning + '>' if meaning else word
 
 
 if __name__ == '__main__':

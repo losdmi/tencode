@@ -1,5 +1,4 @@
 import os
-import re
 from pprint import pprint
 import logging
 
@@ -7,7 +6,7 @@ from typing import Dict
 
 from tencode_replacer import replace_tencode_in_message
 
-from telegram import Update, Message, User, ParseMode, MessageEntity
+from telegram import Update, Message, User, ParseMode, MessageEntity, Chat
 from telegram.ext import Updater, MessageHandler, Filters
 
 updater = Updater(token=os.getenv('BOT_TOKEN'))
@@ -28,7 +27,6 @@ _entity_type_to_symbols = {
 
 def _handle(bot, update: Update):
     message: Message = update.message
-    user: User = message.from_user
     original_message = _fill_message_with_entities(message.text, message.parse_entities())
     decoded_message = replace_tencode_in_message(original_message)
 
@@ -44,18 +42,14 @@ def _handle(bot, update: Update):
     print()
 
     if decoded_message != original_message:
-        reply = "{user} сказал:\n\n{message}".format(
+        user: User = message.from_user
+        is_group = message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
+        body = "{user} сказал:\n\n{message}" if is_group else '{message}'
+        reply = body.format(
             user=user.full_name,
             message=decoded_message
         )
-        reply = re.sub(
-            r'(?<![{symbols}])\['.format(
-                symbols=re.escape(''.join(_entity_type_to_symbols.values()))
-            ),
-            r'\[',
-            reply
-        )
-        print(reply)
+        print('reply=' + reply)
         print()
         print()
         bot.send_message(
@@ -70,6 +64,7 @@ def _fill_message_with_entities(message: str, entities: Dict[MessageEntity, str]
     border = 0
 
     for entity, text in entities.items():
+        print(str(entity))
         wrapper = _entity_type_to_symbols.get(entity.type)
         if wrapper:
             result += '{before}{wrapper}{text}{wrapper}'.format(
