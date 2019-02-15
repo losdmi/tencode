@@ -1,5 +1,6 @@
 import json
-import pprint
+
+from lib import entity_type_to_symbols
 
 _tencodes_dictionary = json.loads(open('tencodes.json').read())
 
@@ -11,6 +12,7 @@ def replace_tencode_in_message(message: str) -> str:
     modified_message = []
 
     lines = message.split(_lines_delimiter)
+    entities_symbols = ''.join(entity_type_to_symbols.values())
 
     for line in lines:
         words = line.split(_words_delimiter)
@@ -21,7 +23,9 @@ def replace_tencode_in_message(message: str) -> str:
             if word == '':
                 modified_word = _words_delimiter
             else:
-                modified_word = _get_tencode_meaning(word)
+                extracted_word = word.strip(entities_symbols)
+                decoded_word = _get_tencode_meaning(extracted_word)
+                modified_word = word.replace(extracted_word, decoded_word)
 
             modified_line.append(modified_word)
 
@@ -36,6 +40,7 @@ def _get_tencode_meaning(word: str) -> str:
 
 
 if __name__ == '__main__':
+    import pprint
     pprint.pprint(replace_tencode_in_message(
         '''Произвольный текст     сообщения где есть 
 
