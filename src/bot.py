@@ -1,4 +1,5 @@
 import os
+import re
 from pprint import pprint
 import logging
 
@@ -9,8 +10,6 @@ from tencode_replacer import replace_tencode_in_message
 from telegram import Update, Message, User, ParseMode, MessageEntity
 from telegram.ext import Updater, MessageHandler, Filters
 
-from lib import entity_type_to_symbols
-
 updater = Updater(token=os.getenv('BOT_TOKEN'))
 dispatcher = updater.dispatcher
 
@@ -18,6 +17,13 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
+
+_entity_type_to_symbols = {
+    MessageEntity.BOLD: '*',
+    MessageEntity.ITALIC: '_',
+    MessageEntity.CODE: '`',
+    MessageEntity.PRE: '```'
+}
 
 
 def _handle(bot, update: Update):
@@ -38,12 +44,23 @@ def _handle(bot, update: Update):
     print()
 
     if decoded_message != original_message:
+        reply = "{user} сказал:\n\n{message}".format(
+            user=user.full_name,
+            message=decoded_message
+        )
+        reply = re.sub(
+            r'(?<![{symbols}])\['.format(
+                symbols=re.escape(''.join(_entity_type_to_symbols.values()))
+            ),
+            r'\[',
+            reply
+        )
+        print(reply)
+        print()
+        print()
         bot.send_message(
             chat_id=message.chat_id,
-            text="{user} сказал:\n\n{message}".format(
-                user=user.full_name,
-                message=decoded_message
-            ),
+            text=reply,
             parse_mode=ParseMode.MARKDOWN
         )
 
@@ -53,7 +70,7 @@ def _fill_message_with_entities(message: str, entities: Dict[MessageEntity, str]
     border = 0
 
     for entity, text in entities.items():
-        wrapper = entity_type_to_symbols.get(entity.type)
+        wrapper = _entity_type_to_symbols.get(entity.type)
         if wrapper:
             result += '{before}{wrapper}{text}{wrapper}'.format(
                 before=message[border:entity.offset],

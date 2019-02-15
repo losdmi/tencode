@@ -1,6 +1,5 @@
 import json
-
-from lib import entity_type_to_symbols
+import re
 
 _tencodes_dictionary = json.loads(open('tencodes.json').read())
 
@@ -12,7 +11,6 @@ def replace_tencode_in_message(message: str) -> str:
     modified_message = []
 
     lines = message.split(_lines_delimiter)
-    entities_symbols = ''.join(entity_type_to_symbols.values())
 
     for line in lines:
         words = line.split(_words_delimiter)
@@ -23,7 +21,17 @@ def replace_tencode_in_message(message: str) -> str:
             if word == '':
                 modified_word = _words_delimiter
             else:
-                extracted_word = word.strip(entities_symbols)
+                regex_to_strip = r'\D'
+                extracted_word = re.sub(
+                    '^{regex}'.format(regex=regex_to_strip),
+                    '',
+                    word
+                )
+                extracted_word = re.sub(
+                    '{regex}$'.format(regex=regex_to_strip),
+                    '',
+                    extracted_word
+                )
                 decoded_word = _get_tencode_meaning(extracted_word)
                 modified_word = word.replace(extracted_word, decoded_word)
 
