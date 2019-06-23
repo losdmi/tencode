@@ -21,7 +21,7 @@ def replace_tencode_in_message(message: str) -> str:
             if word == '':
                 modified_word = _words_delimiter
             else:
-                regex_to_strip = r'\D'
+                regex_to_strip = r'\D*'
                 extracted_word = re.sub(
                     '^{regex}'.format(regex=regex_to_strip),
                     '',
@@ -32,8 +32,11 @@ def replace_tencode_in_message(message: str) -> str:
                     '',
                     extracted_word
                 )
-                decoded_word = _get_tencode_meaning(extracted_word)
-                modified_word = word.replace(extracted_word, decoded_word)
+                if extracted_word:
+                    decoded_word = _get_tencode_meaning(extracted_word)
+                    modified_word = word.replace(extracted_word, decoded_word)
+                else:
+                    modified_word = word
 
             modified_line.append(modified_word)
 

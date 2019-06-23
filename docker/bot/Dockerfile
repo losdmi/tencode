@@ -39,4 +39,4 @@ ENV PIPENV_VENV_IN_PROJECT=1
 COPY ${src}/* ${app_root}/
 RUN python -m pip install -r requirements.txt
 
-#ENTRYPOINT ./entrypoint.sh
+ENTRYPOINT python bot.py

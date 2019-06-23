@@ -1,5 +1,4 @@
 import os
-from pprint import pprint
 import logging
 
 from typing import Dict
@@ -30,17 +29,6 @@ def _handle(bot, update: Update):
     original_message = _fill_message_with_entities(message.text, message.parse_entities())
     decoded_message = replace_tencode_in_message(original_message)
 
-    pprint(original_message)
-    print()
-    print()
-    pprint(decoded_message)
-    print()
-    print()
-    pprint(str(update))
-    print()
-    print()
-    print()
-
     if decoded_message != original_message:
         user: User = message.from_user
         is_group = message.chat.type in [Chat.GROUP, Chat.SUPERGROUP]
@@ -49,9 +37,6 @@ def _handle(bot, update: Update):
             user=user.full_name,
             message=decoded_message
         )
-        print('reply=' + reply)
-        print()
-        print()
         bot.send_message(
             chat_id=message.chat_id,
             text=reply,
@@ -59,12 +44,14 @@ def _handle(bot, update: Update):
         )
 
 
-def _fill_message_with_entities(message: str, entities: Dict[MessageEntity, str]) -> str:
+def _fill_message_with_entities(
+    message: str,
+    entities: Dict[MessageEntity, str]
+) -> str:
     result = ''
     border = 0
 
     for entity, text in entities.items():
-        print(str(entity))
         wrapper = _entity_type_to_symbols.get(entity.type)
         if wrapper:
             result += '{before}{wrapper}{text}{wrapper}'.format(
