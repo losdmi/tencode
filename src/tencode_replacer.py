@@ -1,7 +1,7 @@
 import json
 import re
 
-_tencodes_dictionary = json.loads(open('tencodes.json').read())
+tencodes_dictionary = json.loads(open('tencodes.json').read())
 
 _lines_delimiter = '\n'
 _words_delimiter = ' '
@@ -43,7 +43,7 @@ def replace_tencode_in_message(message: str) -> str:
 
 
 def _get_tencode_meaning(word: str) -> str:
-    meaning = _tencodes_dictionary.get(word)
+    meaning = tencodes_dictionary.get(word)
     return '<' + meaning + '>' if meaning else word
 
 
