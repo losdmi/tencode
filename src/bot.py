@@ -27,7 +27,8 @@ _entity_type_to_html_tag = {
 
 def _handle_text_message(bot: Bot, update: Update):
     message: Message = update.message
-    original_message = _fill_message_with_entities(message.text, message.parse_entities())
+    message_text = message.text or message.caption
+    original_message = _fill_message_with_entities(message_text, message.parse_entities())
     decoded_message = replace_tencode_in_message(original_message)
 
     if decoded_message != original_message:
@@ -80,7 +81,7 @@ def _handle_show_command(bot: Bot, update: Update):
     )
 
 
-dispatcher.add_handler(MessageHandler(Filters.text, _handle_text_message))
+dispatcher.add_handler(MessageHandler(Filters.text | Filters.photo, _handle_text_message))
 dispatcher.add_handler(CommandHandler('show', _handle_show_command))
 
 updater.start_polling()
