@@ -17,11 +17,11 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-_entity_type_to_symbols = {
-    MessageEntity.BOLD: '*',
-    MessageEntity.ITALIC: '_',
-    MessageEntity.CODE: '`',
-    MessageEntity.PRE: '```'
+_entity_type_to_html_tag = {
+    MessageEntity.BOLD: 'b',
+    MessageEntity.ITALIC: 'i',
+    MessageEntity.CODE: 'code',
+    MessageEntity.PRE: 'pre'
 }
 
 
@@ -41,7 +41,7 @@ def _handle_text_message(bot: Bot, update: Update):
         bot.send_message(
             chat_id=message.chat_id,
             text=reply,
-            parse_mode=ParseMode.MARKDOWN
+            parse_mode=ParseMode.HTML
         )
 
 
@@ -53,11 +53,11 @@ def _fill_message_with_entities(
     border = 0
 
     for entity, text in entities.items():
-        wrapper = _entity_type_to_symbols.get(entity.type)
-        if wrapper:
-            result += '{before}{wrapper}{text}{wrapper}'.format(
+        tag = _entity_type_to_html_tag.get(entity.type)
+        if tag:
+            result += '{before}<{tag}>{text}</{tag}>'.format(
                 before=message[border:entity.offset],
-                wrapper=wrapper,
+                tag=tag,
                 text=text
             )
             border = entity.offset + entity.length

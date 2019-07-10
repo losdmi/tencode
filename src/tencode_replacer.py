@@ -1,5 +1,6 @@
 import json
 import re
+import html
 
 tencodes_dictionary = json.loads(open('tencodes.json').read())
 
@@ -44,7 +45,7 @@ def replace_tencode_in_message(message: str) -> str:
 
 def _get_tencode_meaning(word: str) -> str:
     meaning = tencodes_dictionary.get(word)
-    return '<' + meaning + '>' if meaning else word
+    return html.escape('<') + meaning + html.escape('>') if meaning else word
 
 
 if __name__ == '__main__':
